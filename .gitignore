@@ -1,0 +1,16 @@
+# .NET build output
+bin/
+obj/
+
+# Test results / coverage
+[Tt]est[Rr]esult*/
+coverage/
+*.trx
+
+# IDE / OS
+.vs/
+.idea/
+*.user
+*.log
+.DS_Store
+.env
