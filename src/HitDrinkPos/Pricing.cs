@@ -1,6 +1,7 @@
 // Pricing.cs — 杯款基礎定價 (base pricing)
 // 這是穩定核心,練習中不需要修改。
 
+using System;
 using System.Collections.Generic;
 
 namespace HitDrinkPos;
