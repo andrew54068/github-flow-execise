@@ -1,5 +1,8 @@
 // Pricing.cs — 杯款基礎定價 (base pricing)
-// 這是穩定核心,練習中不需要修改。
+//
+// 第一關:這是穩定核心,不用改。
+// ⚠️ 第二關 (兩人一起):雙方會「各自在自己的 branch」往 BasePriceTable 同一個位置
+//    加一款新飲料,故意製造 merge conflict 來練習解衝突。見 docs/tasks/level-2-merge-conflict.md。
 
 using System.Collections.Generic;
 
@@ -14,6 +17,7 @@ public static class Pricing
         ["blackTea"] = 30, // 紅茶
         ["milkTea"] = 50,  // 奶茶
         ["latte"] = 65,    // 拿鐵
+        // 👇 第二關:把你的新杯款加在這一行下面 (兩人都加在這裡 → 製造 conflict)
     };
 
     // 尺寸加價 (size surcharge)

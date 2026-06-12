@@ -1,7 +1,7 @@
 // Toppings.cs — 加料計價 (topping pricing)
 //
-// ⚠️ 練習任務 (承勳):目前這是一個「空殼 stub」,任何加料都回傳 0 元。
-//    請依 docs/tasks/task-A-feature-toppings.md 把它實作成真正的加料計價。
+// ⚠️ 第一關任務 (承勳):目前這是一個「空殼 stub」,任何加料都回傳 0 元。
+//    請依 docs/tasks/level-1-feature-and-review.md 把它實作成真正的加料計價。
 //
 // 預期的加料價目 (topping menu)，單位:元:
 //   珍珠 pearl  +10

@@ -1,7 +1,7 @@
 // ReceiptTests.cs — 訂單結帳 (非空訂單,綠的)
 //
-// 注意:空訂單的 AveragePerCup() 會 crash——那是隨 v1.1.0 出貨的 bug,
-// 走 hotfix 流程處理 (見 task C),這裡先不測空訂單。
+// 注意:空訂單的 AveragePerCup() 會 crash——那是 v0.1.0 出貨前就有的 bug,
+// 走 hotfix 流程處理 (見 level-4),這裡先不測空訂單。
 
 using System;
 using Xunit;

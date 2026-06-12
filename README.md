@@ -9,7 +9,7 @@
 
 - **單一工具鏈**:測試用 `dotnet test`(xUnit),只要裝好 .NET SDK 就能跑。
 - **程式小到一眼看完**:你才能把注意力放在 *git 流程* 而不是業務邏輯。
-- **有故意種好的 (planted) 任務**:一個缺的 feature、一個 bug、一個已出貨的 crash——剛好對應三種分支類型。
+- **四關循序漸進**:從最順的 happy path,一路練到解 conflict、發版本、hotfix 跨版本傳播。
 
 ## 先決條件 (prerequisites)
 
@@ -33,27 +33,30 @@ dotnet test       # 還原套件、build,然後跑整個測試專案
 
 ```
 src/HitDrinkPos/
-├── Pricing.cs    杯款基礎定價 (穩定核心,不用改)
-├── Toppings.cs   加料計價 —— 🅰️ 承勳的 feature 任務 (目前是空殼 stub)
-├── Discount.cs   滿額折扣 —— 🅱️ 家瑞的 bug 任務 (邊界 off-by-one)
-└── Receipt.cs    訂單結帳 —— 🅲 進階 hotfix 任務 (空訂單會 crash)
+├── Pricing.cs    杯款基礎定價 (第二關:兩人在這裡加新杯款 → 解 conflict)
+├── Toppings.cs   加料計價 (第一關:承勳的 feature,目前是空殼 stub)
+├── Discount.cs   滿額折扣 (第一關:家瑞的 bug,邊界 off-by-one)
+└── Receipt.cs    訂單結帳 (第四關:空訂單會 crash → hotfix)
 test/HitDrinkPos.Tests/   對應每個 src 檔的 xUnit 測試
-docs/tasks/               三份任務卡 (task A / B / C)
+docs/tasks/               四關任務卡 (level-1 ~ level-4)
 HitDrinkPos.sln           方案檔 (solution),含 library 與 test 兩個專案
 ```
 
-## 你的任務卡
+## 四關闖關卡
 
-| 任務 | 負責人 | 分支類型 | 檔案 |
+| 關卡 | 主題 | 誰做 | 任務卡 |
 |---|---|---|---|
-| 🅰️ 實作加料計價 | 承勳 | `feature/*` → `main` | [task-A-feature-toppings.md](docs/tasks/task-A-feature-toppings.md) |
-| 🅱️ 修滿額折扣邊界 bug | 家瑞 | `bug/*` → `main` | [task-B-bug-discount.md](docs/tasks/task-B-bug-discount.md) |
-| 🅲 修空訂單 crash (進階) | 兩人一起 | `hotfix/v1.1.0-*` → `release/v1.1.0` | [task-C-hotfix-empty-order.md](docs/tasks/task-C-hotfix-empty-order.md) |
+| 🟢 第一關 | feature / bug + review (happy path) | 兩人平行 | [level-1-feature-and-review.md](docs/tasks/level-1-feature-and-review.md) |
+| 🟡 第二關 | 改同一檔 → 解 merge conflict | 兩人平行 | [level-2-merge-conflict.md](docs/tasks/level-2-merge-conflict.md) |
+| 🟠 第三關 | 依序發佈 v0.1.0 → v0.2.0 | 兩人輪流 | [level-3-sequential-releases.md](docs/tasks/level-3-sequential-releases.md) |
+| 🔴 第四關 | hotfix + 跨版本傳播 | 兩人一起 | [level-4-hotfix-propagation.md](docs/tasks/level-4-hotfix-propagation.md) |
+
+> 循序闖關,每一關都要等上一關 merge 完才開始。
 
 ## 怎麼開始
 
-1. 讀 [EXERCISE.md](EXERCISE.md) —— 整場練習的流程地圖 + 速查表。
-2. 打開你自己的任務卡,照著做。
+1. 讀 [EXERCISE.md](EXERCISE.md) —— 整套練習的流程地圖 + 速查表。
+2. 從 [第一關](docs/tasks/level-1-feature-and-review.md) 開始,照著做。
 3. 兩個 skill 已經放在 repo 裡,**Claude Code、Codex、Cursor 共用同一份**,工具會自動引用:
    - `hit-committer` —— 幫你做出 atomic、符合 Hit 格式的 commit。
    - `git-github-flow` —— 幫你選對 branch、base,開出正確的 PR。
