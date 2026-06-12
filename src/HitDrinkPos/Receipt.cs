@@ -3,9 +3,10 @@
 // 一筆訂單 (order) 是多杯飲料 (cup) 的陣列,每杯:
 //   new Cup("milkTea", "L", new[] { "pearl" })
 //
-// ⚠️ 進階練習任務 (hotfix):AveragePerCup() 在「空訂單」時會 crash。
-//    這個 bug 已經隨 v1.1.0 出貨,所以要走 hotfix 流程修在 release/v1.1.0 上。
-//    詳見 docs/tasks/task-C-hotfix-empty-order.md。
+// ⚠️ 第四關練習 (hotfix):AveragePerCup() 在「空訂單」時會 crash。
+//    這個 bug 在 v0.1.0 出貨前就存在,所以 v0.1.0 與 v0.2.0 兩條 release 線都中。
+//    要走 hotfix 流程:修在「最早受影響的線」release/v0.1.0 上,再傳播到 main 與 release/v0.2.0。
+//    詳見 docs/tasks/level-4-hotfix-propagation.md。
 
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ public static class Receipt
     // 平均每杯價格 (average price per cup)
     public static double AveragePerCup(IReadOnlyCollection<Cup> order)
     {
-        // BUG(v1.1.0): 空訂單時 Average() 對空序列直接 throw InvalidOperationException。
+        // BUG(v0.1.0/v0.2.0): 空訂單時 Average() 對空序列直接 throw InvalidOperationException。
         return order.Select(LineTotal).Average();
     }
 }

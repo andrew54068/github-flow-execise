@@ -4,8 +4,8 @@
 //   滿 100 折 10
 //   滿 200 折 30
 //
-// ⚠️ 練習任務 (家瑞):這裡有一個「邊界 bug」。當金額「剛好」等於門檻時,
-//    折扣沒有生效。請依 docs/tasks/task-B-bug-discount.md 先寫測試重現,再修正。
+// ⚠️ 第一關任務 (家瑞):這裡有一個「邊界 bug」。當金額「剛好」等於門檻時,
+//    折扣沒有生效。請依 docs/tasks/level-1-feature-and-review.md 先寫測試重現,再修正。
 
 using System.Collections.Generic;
 
