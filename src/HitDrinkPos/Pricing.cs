@@ -4,6 +4,7 @@
 // ⚠️ 第二關 (兩人一起):雙方會「各自在自己的 branch」往 BasePriceTable 同一個位置
 //    加一款新飲料,故意製造 merge conflict 來練習解衝突。見 docs/tasks/level-2-merge-conflict.md。
 
+using System;
 using System.Collections.Generic;
 
 namespace HitDrinkPos;
