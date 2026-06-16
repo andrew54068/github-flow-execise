@@ -1,7 +1,4 @@
-// DiscountTests.cs — 滿額折扣 (目前僅測「非邊界」金額,所以是綠的)
-//
-// 注意:剛好等於門檻 (100、200) 的邊界測試「故意」還沒寫——那正是 bug 所在。
-// 由家瑞在第一關先補上會失敗的邊界測試,重現 bug 後再修 (見 level-1)。
+// DiscountTests.cs — 滿額折扣
 
 using Xunit;
 
@@ -26,5 +23,12 @@ public class DiscountTests
     public void 超過200折30()
     {
         Assert.Equal(30, Discount.DiscountFor(250));
+    }
+
+    [Fact]
+    public void 剛好達到門檻就要折扣_邊界()
+    {
+        Assert.Equal(10, Discount.DiscountFor(100));
+        Assert.Equal(30, Discount.DiscountFor(200));
     }
 }
