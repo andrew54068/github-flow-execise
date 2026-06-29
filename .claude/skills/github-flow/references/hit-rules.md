@@ -1,6 +1,6 @@
 # Hit branch strategy — distilled rules
 
-Self-contained digest of the *Hit 分支策略與 GitHub 操作手冊* (1A v3.0, "Release-Branch per Version"). Source of truth for `git-github-flow`. Commit-message rules are intentionally NOT duplicated here — those belong to the `hit-committer` skill (see "Commits" below).
+Self-contained digest of the *Hit 分支策略與 GitHub 操作手冊* (1A v3.0, "Release-Branch per Version"). Source of truth for `github-flow`. Commit-message rules are intentionally NOT duplicated here — those belong to the `hit-committer` skill (see "Commits" below).
 
 ## Core model
 
@@ -12,7 +12,7 @@ Self-contained digest of the *Hit 分支策略與 GitHub 操作手冊* (1A v3.0,
 
 ## Iron rule
 
-Integration into `main` or **any** `release/v<X.Y.Z>` is **only** through a GitHub Pull Request. Both are protected — **no direct push**. `feature/* bug/* refactor/* test/* chore/* → main`; `hotfix/v*-* → release/v<X.Y.Z>`; `release/v<X.Y.Z> → main` backflow (finalize / newest-line hotfix, **merge commit**); superseded-line cherry-pick propagation via `port/*-to-<target>`. Locally you never push straight to a long-lived / release branch — even the backflow uses `release/*` as a PR **head**, never a direct push.
+Integration into `main` or **any** `release/v<X.Y.Z>` is **only** through a GitHub Pull Request — **no direct push of commits**. `feature/* bug/* refactor/* test/* chore/* → main`; `hotfix/v*-* → release/v<X.Y.Z>`; `release/v<X.Y.Z> → main` backflow (finalize / newest-line hotfix, **merge commit**); superseded-line cherry-pick propagation via `port/*-to-<target>`. **Exception:** the initial `git push -u` that creates a new `release/v<X.Y.Z>` on the remote is allowed — this is branch creation, not a commit push. Whether the server enforces this via branch-protection is discovered in Step 0. Locally you never push commits straight to a long-lived / release branch — even the backflow uses `release/*` as a PR **head**, never a direct push.
 
 ## Branch table
 
@@ -42,15 +42,15 @@ Every branch except `main` is named `<category>/<description>`; version and shor
 |---|---|---|---|
 | `v<X.Y.Z>` | human-readable version anchor (PM / support) | `release/v<X.Y.Z>` — the cut point for a first release, or the hotfix PR-merge commit for a patch | ✅ yes |
 
-One `v<X.Y.Z>` tag per version. Cross-version fixes are traced by **cherry-pick + PR**, not semantic tags. **Tagging and Releases are Release-Owner actions** — `git-github-flow` stops at "PR opened".
+One `v<X.Y.Z>` tag per version. Cross-version fixes are traced by **cherry-pick + PR**, not semantic tags. **Tagging and Releases are Release-Owner actions** — `github-flow` stops at "PR opened".
 
 ## Commits
 
-Commit crafting is the **`hit-committer`** skill's job — `git-github-flow` delegates to it once the correct branch is checked out. In short: atomic, single-concern commits with English `[type] Description` titles (`[feat] [fix] [hotfix] [refactor] [perf] [docs] [test] [style] [chore]`). Full spec lives in `hit-committer/references/commit-spec.md`. Do not re-implement it here.
+Commit crafting is the **`hit-committer`** skill's job — `github-flow` delegates to it once the correct branch is checked out. In short: atomic, single-concern commits with English `[type] Description` titles (`[feat] [fix] [hotfix] [refactor] [perf] [docs] [test] [style] [chore]`). Full spec lives in `hit-committer/references/commit-spec.md`. Do not re-implement it here.
 
 ## The 5 disciplines
 
-1. **`main` & `release/*` are protected; no direct push, no history rewrite.** No direct push / `rebase` / `commit --amend` / `push --force` / `tag -f` on them. All changes via a PR — a `release/*` line may be a PR **head** into `main` (backflow), still a PR, never a direct push.
+1. **`main` & `release/*` — no direct commit push, no history rewrite.** No `commit` / `rebase` / `commit --amend` / `push --force` / `tag -f` on them. All changes via a PR — a `release/*` line may be a PR **head** into `main` (backflow), still a PR, never a direct commit push. **Exception:** the initial `git push -u` that creates a new `release/v<X.Y.Z>` on the remote is allowed (branch creation, not a commit push). Whether the server enforces this via branch-protection is discovered in Step 0.
 2. **Hotfixes propagate immediately, never accumulate.** Fix on the earliest affected in-use line; after it merges and is patch-tagged, *immediately* (before the next hotfix opens) carry it to `main` — **newest line** → merge `release/v<X.Y.Z> → main`; **superseded line** → cherry-pick (via `port/*-to-<target>` + PR) to `main` and every *newer* in-use release. Skipping `main` makes future releases regress the bug.
 3. **The hotfix is the authority on conflicts.** When a `port/*` cherry-pick **or** a `release/* → main` backflow merge conflicts, the release's hotfix content wins — the target's pre-existing implementation is unverified and must be overwritten.
 4. **Short-lived branches integrate clean + tested.** `rebase -i` tidy + the matching integration tests before PR-merge; CI must test the *merged* state.
@@ -65,7 +65,7 @@ Commit crafting is the **`hit-committer`** skill's job — `git-github-flow` del
 | Developer | Write | creates `feature/ bug/ hotfix/ port/` branches, opens PRs, responds to review |
 | Reviewer | Write | reviews, Approve / Request changes |
 
-`git-github-flow` operates in the **Developer** lane: branch → (delegate commits) → PR. It does not merge, tag, or release.
+`github-flow` operates in the **Developer** lane: branch → (delegate commits) → PR. It does not merge, tag, or release.
 
 ## PR base routing (what the flow must get right)
 

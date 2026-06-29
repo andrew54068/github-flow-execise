@@ -1,6 +1,6 @@
 # Hotfix, cross-version propagation, and release cut — playbooks
 
-Exact command sequences for the higher-stakes flows. `<remote>` is the detected remote (often `origin`, sometimes `hantop`). `git-github-flow` drives the Developer-lane steps (branch → delegate commits → PR) and stops before Release-Owner-only actions (merge, tag, Release). Commit crafting in every "commit" step below is delegated to the **`hit-committer`** skill — don't hand-write the messages here.
+Exact command sequences for the higher-stakes flows. `<remote>` is the detected remote (often `origin`, sometimes `hantop`). `github-flow` drives the Developer-lane steps (branch → delegate commits → PR) and stops before Release-Owner-only actions (merge, tag, Release). Commit crafting in every "commit" step below is delegated to the **`hit-committer`** skill — don't hand-write the messages here.
 
 ---
 
@@ -92,7 +92,7 @@ After all targets are done: confirm each port PR is open/merged, the Release is 
 
 ## §7.3 Backflow a *newest-line* hotfix (merge `release/v<X.Y.Z>` → `main`)
 
-Use this when the hotfixed line is the **newest** in-use line (no newer `release/v*`). The fix reaches `main` by **merging the release line itself** — there is **no `port/*`-to-main**. `git-github-flow` opens the PR; the Release Owner merges (both branches protected). Example: newest line `release/v1.2.0`, hotfix tagged `v1.2.1`.
+Use this when the hotfixed line is the **newest** in-use line (no newer `release/v*`). The fix reaches `main` by **merging the release line itself** — there is **no `port/*`-to-main**. `github-flow` opens the PR; the Release Owner merges (both branches protected). Example: newest line `release/v1.2.0`, hotfix tagged `v1.2.1`.
 
 ```bash
 # align both ends locally (never push protected branches directly)
@@ -121,7 +121,7 @@ PR settings:
 
 ## §6 Release cut (Release-Owner context — informational)
 
-`git-github-flow` does **not** perform this (it's not a PR flow, and only the Release Owner may). Documented so you can recognize and explain it.
+`github-flow` does **not** perform this (it's not a PR flow, and only the Release Owner may). Documented so you can recognize and explain it.
 
 ```bash
 git checkout main
@@ -138,7 +138,7 @@ git push <remote> v1.1.0
 
 Then GitHub `Releases → Draft a new release` → choose tag `v1.1.0` → `Generate release notes` → attach artifacts → `Publish`. The branch is kept as the version's maintenance line.
 
-**Finalize sync (a PR flow `git-github-flow` *does* open):** if release-prep commits (version bump, changelog, release notes) were added on the line, open a `release/v1.1.0 → main` PR so `main` gains them:
+**Finalize sync (a PR flow `github-flow` *does* open):** if release-prep commits (version bump, changelog, release notes) were added on the line, open a `release/v1.1.0 → main` PR so `main` gains them:
 
 | PR field | Value |
 |---|---|
