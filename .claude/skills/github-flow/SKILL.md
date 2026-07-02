@@ -1,10 +1,10 @@
 ---
-name: git-github-flow
+name: github-flow
 description: >-
   Open the correct PR under the Hit branch strategy: pick the right branch and base, enforce protected `main` / `release/*`, and route the PR — incl. `release/* → main` backflow (finalize / newest-line hotfix) and older-line hotfix `port/*` cherry-pick propagation. Use for Hit-repo branch/PR work: open a PR, start a feature/bug/hotfix, backport/port a fix, finalize/merge a release, or anything touching `release/v*`, hotfixes, or backflow. Delegates commits to hit-committer; opens PRs but never merges, tags, or releases.
 ---
 
-# git-github-flow
+# github-flow
 
 Own the path from a change to an open Pull Request under the **Hit branch strategy**: single protected `main`, per-version `release/v<X.Y.Z>` lines, PR-only integration, `release/* → main` backflow (finalize sync + newest-line hotfix merge), and cherry-pick propagation of older-line hotfixes. Pick the right branch, enforce the protections, route the PR to the right base, and drive hotfix backflow/backports.
 
@@ -16,7 +16,7 @@ The rules are bundled and self-contained, so this works in any team repo (`ipc-f
 
 ## The one rule that overrides everything
 
-`main` and every `release/v<X.Y.Z>` are **protected**: no direct push, no `rebase`/`amend`/`--force`/`tag -f`, no committing while standing on them. Every change reaches them via a PR. If `HEAD` is on `main` or `release/*` **with changes to commit**, the first move is always to create the proper branch (uncommitted changes follow `git checkout -b`, so the protected branch stays clean). **Exception — backflow:** a *clean* `release/*` line that is itself the PR **head** for a `release/* → main` backflow (finalize sync / newest-line hotfix) is **not** moved off — you open `release/* → main` directly. The no-commit rule still holds: you never commit *onto* a protected branch, but a protected line may *be* a PR head.
+`main` and every `release/v<X.Y.Z>` are treated as long-lived integration branches: this skill will never commit while standing on them, never `rebase`/`amend`/`--force`/`tag -f` them, and never push commits to them directly. Every change reaches them via a PR. Whether the server actually enforces this is discovered in **Step 0** — if branch-protection is missing or incomplete, warn the user so they can fix it. If `HEAD` is on `main` or `release/*` **with changes to commit**, the first move is always to create the proper branch (uncommitted changes follow `git checkout -b`, so the long-lived branch stays clean). **Two exceptions:** (1) **Branch creation** — the initial `git push -u` that creates a new `release/v<X.Y.Z>` on the remote is allowed (this is branch creation, not a commit push). (2) **Backflow** — a *clean* `release/*` line that is itself the PR **head** for a `release/* → main` backflow (finalize sync / newest-line hotfix) is **not** moved off — you open `release/* → main` directly. The no-commit rule still holds: you never commit *onto* a long-lived branch, but one may *be* a PR head.
 
 ## Operating mode: Plan → approve → PR
 
@@ -33,6 +33,44 @@ git branch -a --list 'release/*'   # which release lines exist / are in use
 ```
 
 Derive the **remote name** (sole remote; else prefer `origin`, else the one matching the GitHub repo, else ask — never hardcode `origin`), the **trunk** (`main`), whether you're on a **protected branch**, and whether a valid short-lived branch already exists to reuse.
+
+### Read branch-protection rules (also in Step 0)
+
+Different repos have different protection configs. Before planning, probe the actual rules for `main` and every in-use `release/*` line so you know what the repo enforces — don't hardcode assumptions.
+
+```bash
+# main
+gh api repos/{owner}/{repo}/branches/main/protection --jq '{
+  require_pr: (.required_pull_request_reviews != null),
+  required_approvals: .required_pull_request_reviews.required_approving_review_count,
+  dismiss_stale: .required_pull_request_reviews.dismiss_stale_reviews,
+  require_last_push_approval: .required_pull_request_reviews.require_last_push_approval,
+  enforce_admins: .enforce_admins.enabled,
+  force_push: .allow_force_pushes.enabled,
+  linear_history: .required_linear_history.enabled,
+  conversation_resolution: .required_conversation_resolution.enabled
+}' 2>/dev/null || echo '{"error": "no protection or no access"}'
+
+# each release line (URL-encode the slash)
+gh api repos/{owner}/{repo}/branches/release%2Fv<X.Y.Z>/protection --jq '...' 2>/dev/null
+```
+
+Also check for the newer **rulesets** API (repos that use it won't have legacy protection):
+```bash
+gh api repos/{owner}/{repo}/rulesets --jq '.[].name' 2>/dev/null
+```
+
+**What to do with the data:**
+- **`require_pr: true`** — confirms the PR-only integration rule is enforced server-side. If `false` on `main` or a `release/*`, warn the user ("branch protection isn't enforcing PR reviews — direct pushes could bypass the Hit strategy").
+- **`required_approvals`** — note in the plan so the user knows how many approvals are needed before the Release Owner can merge.
+- **`dismiss_stale_reviews: true`** — after force-pushing or rebasing, existing approvals reset. Warn: "approvals will be dismissed if you rebase."
+- **`require_last_push_approval: true`** — the person who pushed last cannot be the sole approver. Note this if relevant (solo contributor).
+- **`enforce_admins: true`** — even admins can't bypass. Useful context when the user *is* admin.
+- **`force_push: true`** — unusual for protected branches; warn the user that force-push is allowed (the Hit strategy forbids it regardless, but the repo isn't enforcing that).
+- **`linear_history: true`** — merge commits are banned, which conflicts with the backflow rule (backflow PRs *require* merge commits). Flag this as a blocker: "linear history is on for `main`, but `release/* → main` backflow needs a merge commit — ask the repo owner to allow merge commits or disable linear-history for backflow."
+- **error / no protection** — the branch exists but has no protection rules. Warn: "no branch protection on `<branch>` — Hit strategy relies on it; recommend setting up protection."
+
+Don't block on missing protection — the skill still works, it just can't rely on the server to prevent mistakes. Surface findings in the plan so the user can fix any gaps.
 
 ## Step 1 — Classify the change → branch category
 
@@ -126,7 +164,7 @@ See `references/hotfix-and-port.md` for the exact command playbooks (§7.2 super
 
 ## Guardrails — never do these
 
-- Never `commit`/`push`/`rebase`/`amend`/`--force`/`tag -f` on `main` or any `release/*`. Everything via a PR. (A `release/*` line MAY be a PR **head** into `main` — that's the backflow; still a PR, still never a direct push.)
+- Never `commit`/`rebase`/`amend`/`--force`/`tag -f` on `main` or any `release/*`. Never push commits to them directly — all integration via PR. **Exception:** the initial `git push -u` that creates a new `release/v<X.Y.Z>` on the remote is allowed (branch creation, not a commit push). A `release/*` line MAY be a PR **head** into `main` (backflow) — still a PR, still never a direct commit push.
 - Never invent a base. Hotfix → its release line; `port/*` → its target; `release/*` backflow → `main` (merge commit); everything else → `main`.
 - Never merge the PR, create version tags, or publish GitHub Releases — Release-Owner actions. Stop at "PR opened" (including the `release/* → main` PR).
 - Don't write commit messages here — delegate to `hit-committer`.

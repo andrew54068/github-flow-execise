@@ -1,5 +1,5 @@
 {
-  "skill_name": "git-github-flow",
+  "skill_name": "github-flow",
   "notes": "v4.0 model (release CAN merge back to main). Each eval runs in an isolated git sandbox (local bare remote 'hantop', no real GitHub). The subagent performs the full branch->atomic-commits->PR workflow; the PR is emitted as a gh command + body file instead of being created for real. Grading inspects the sandbox git history plus the emitted PR artifacts. Harness: ~/.agents/skills-bullpen/hit-committer-workspace/harness. Evals 1-3 (feature/bug/docs -> main) are unchanged from iteration-1; evals 5-7 exercise the new release->main backflow and the newest-vs-superseded hotfix split.",
   "evals": [
     {
